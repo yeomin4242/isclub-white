@@ -1,25 +1,14 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  Search,
-  Calendar,
-  Eye,
-  Heart,
-  MessageCircle,
-  Plus,
-} from "lucide-react";
+import { useState } from "react"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import NewPostModal from "@/components/new-post-modal"
+import { Search, Eye, Heart, MessageCircle } from "lucide-react"
 
 const mockPosts = [
   {
@@ -27,8 +16,7 @@ const mockPosts = [
     title: "첫 번째 프로젝트 회고: React로 만든 할 일 관리 앱",
     excerpt:
       "React를 처음 배우면서 만든 할 일 관리 앱 개발 과정과 배운 점들을 정리해보았습니다. 컴포넌트 설계부터 상태 관리까지...",
-    content:
-      "React를 처음 배우면서 만든 할 일 관리 앱 개발 과정과 배운 점들을 정리해보았습니다...",
+    content: "React를 처음 배우면서 만든 할 일 관리 앱 개발 과정과 배운 점들을 정리해보았습니다...",
     author: {
       name: "김개발",
       avatar: "/placeholder.svg?height=40&width=40",
@@ -47,8 +35,7 @@ const mockPosts = [
     title: "알고리즘 스터디 3개월 후기",
     excerpt:
       "코딩테스트 준비를 위해 시작한 알고리즘 스터디 3개월간의 여정을 돌아보며, 성장한 점과 아쉬웠던 점들을 공유합니다...",
-    content:
-      "코딩테스트 준비를 위해 시작한 알고리즘 스터디 3개월간의 여정을 돌아보며...",
+    content: "코딩테스트 준비를 위해 시작한 알고리즘 스터디 3개월간의 여정을 돌아보며...",
     author: {
       name: "박알고",
       avatar: "/placeholder.svg?height=40&width=40",
@@ -86,8 +73,7 @@ const mockPosts = [
     title: "신입생을 위한 개발 환경 설정 가이드",
     excerpt:
       "개발을 처음 시작하는 신입생들을 위한 개발 환경 설정 가이드입니다. VS Code 설치부터 Git 설정까지 차근차근...",
-    content:
-      "개발을 처음 시작하는 신입생들을 위한 개발 환경 설정 가이드입니다...",
+    content: "개발을 처음 시작하는 신입생들을 위한 개발 환경 설정 가이드입니다...",
     author: {
       name: "최멘토",
       avatar: "/placeholder.svg?height=40&width=40",
@@ -106,8 +92,7 @@ const mockPosts = [
     title: "UI/UX 디자인 공부 시작하기",
     excerpt:
       "개발자로서 디자인 감각을 기르고 싶어 시작한 UI/UX 공부 과정을 공유합니다. 추천 도서와 온라인 강의, 실습 프로젝트까지...",
-    content:
-      "개발자로서 디자인 감각을 기르고 싶어 시작한 UI/UX 공부 과정을 공유합니다...",
+    content: "개발자로서 디자인 감각을 기르고 싶어 시작한 UI/UX 공부 과정을 공유합니다...",
     author: {
       name: "정디자인",
       avatar: "/placeholder.svg?height=40&width=40",
@@ -121,40 +106,39 @@ const mockPosts = [
     comments: 6,
     readTime: "8분",
   },
-];
+]
 
-const categories = ["전체", "개발", "학습", "활동", "가이드", "디자인"];
+const categories = ["전체", "개발", "학습", "활동", "가이드", "디자인"]
 
 export default function BlogPage() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("전체");
+  const [searchTerm, setSearchTerm] = useState("")
+  const [selectedCategory, setSelectedCategory] = useState("전체")
 
   const filteredPosts = mockPosts.filter((post) => {
     const matchesSearch =
       post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       post.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      post.author.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory =
-      selectedCategory === "전체" || post.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
+      post.author.name.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesCategory = selectedCategory === "전체" || post.category === selectedCategory
+    return matchesSearch && matchesCategory
+  })
 
   const getCategoryColor = (category: string) => {
     switch (category) {
       case "개발":
-        return "bg-blue-50 text-blue-600 border-blue-200";
+        return "bg-blue-50 text-blue-600 border-blue-200"
       case "학습":
-        return "bg-green-50 text-green-600 border-green-200";
+        return "bg-green-50 text-green-600 border-green-200"
       case "활동":
-        return "bg-purple-50 text-purple-600 border-purple-200";
+        return "bg-purple-50 text-purple-600 border-purple-200"
       case "가이드":
-        return "bg-yellow-50 text-yellow-600 border-yellow-200";
+        return "bg-yellow-50 text-yellow-600 border-yellow-200"
       case "디자인":
-        return "bg-pink-50 text-pink-600 border-pink-200";
+        return "bg-pink-50 text-pink-600 border-pink-200"
       default:
-        return "bg-gray-50 text-gray-600 border-gray-200";
+        return "bg-gray-50 text-gray-600 border-gray-200"
     }
-  };
+  }
 
   return (
     <div className="min-h-screen bg-white py-12">
@@ -165,9 +149,7 @@ export default function BlogPage() {
             <MessageCircle className="w-8 h-8 text-cert-red" />
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Blog</h1>
           </div>
-          <p className="text-gray-600">
-            동아리 멤버들의 경험과 지식을 공유하는 공간입니다.
-          </p>
+          <p className="text-gray-600">동아리 멤버들의 경험과 지식을 공유하는 공간입니다.</p>
         </div>
 
         {/* Search and Filter */}
@@ -203,74 +185,66 @@ export default function BlogPage() {
         {/* Blog Posts Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredPosts.map((post) => (
-            <Card
-              key={post.id}
-              className="bg-white border-gray-200 hover:border-cert-red/50 transition-all duration-300 hover:shadow-lg group"
-            >
-              <CardHeader className="pb-4">
-                <div className="flex items-start justify-between mb-3">
-                  <Badge
-                    variant="outline"
-                    className={`${getCategoryColor(post.category)} text-xs`}
-                  >
-                    {post.category}
-                  </Badge>
-                  <span className="text-xs text-gray-400">{post.readTime}</span>
-                </div>
-                <CardTitle className="text-lg text-gray-900 group-hover:text-cert-red transition-colors">
-                  {post.title}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <CardDescription className="text-gray-600 mb-4 line-clamp-3">
-                  {post.excerpt}
-                </CardDescription>
-
-                <div className="flex flex-wrap gap-1 mb-4">
-                  {post.tags.map((tag) => (
-                    <Badge
-                      key={tag}
-                      variant="secondary"
-                      className="text-xs bg-gray-100 text-gray-600 hover:bg-gray-200"
-                    >
-                      {tag}
+            <Link key={post.id} href={`/blog/${post.id}`}>
+              <Card className="bg-white border-gray-200 hover:border-cert-red/50 transition-all duration-300 hover:shadow-lg group">
+                <CardHeader className="pb-4">
+                  <div className="flex items-start justify-between mb-3">
+                    <Badge variant="outline" className={`${getCategoryColor(post.category)} text-xs`}>
+                      {post.category}
                     </Badge>
-                  ))}
-                </div>
+                    <span className="text-xs text-gray-400">{post.readTime}</span>
+                  </div>
+                  <CardTitle className="text-lg text-gray-900 group-hover:text-cert-red transition-colors">
+                    {post.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <CardDescription className="text-gray-600 mb-4 line-clamp-3">{post.excerpt}</CardDescription>
 
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Avatar className="w-8 h-8">
-                      <AvatarImage src={post.author.avatar} />
-                      <AvatarFallback className="text-xs bg-gray-100 text-gray-600">
-                        {post.author.initials}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">
-                        {post.author.name}
-                      </p>
-                      <p className="text-xs text-gray-500">{post.date}</p>
+                  <div className="flex flex-wrap gap-1 mb-4">
+                    {post.tags.map((tag) => (
+                      <Badge
+                        key={tag}
+                        variant="secondary"
+                        className="text-xs bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      >
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Avatar className="w-8 h-8">
+                        <AvatarImage src={post.author.avatar || "/placeholder.svg"} />
+                        <AvatarFallback className="text-xs bg-gray-100 text-gray-600">
+                          {post.author.initials}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">{post.author.name}</p>
+                        <p className="text-xs text-gray-500">{post.date}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="flex items-center gap-4 mt-4 pt-4 border-t border-gray-100">
-                  <div className="flex items-center gap-1 text-gray-500">
-                    <Eye className="w-4 h-4" />
-                    <span className="text-sm">{post.views}</span>
+                  <div className="flex items-center gap-4 mt-4 pt-4 border-t border-gray-100">
+                    <div className="flex items-center gap-1 text-gray-500">
+                      <Eye className="w-4 h-4" />
+                      <span className="text-sm">{post.views}</span>
+                    </div>
+                    <div className="flex items-center gap-1 text-gray-500">
+                      <Heart className="w-4 h-4" />
+                      <span className="text-sm">{post.likes}</span>
+                    </div>
+                    <div className="flex items-center gap-1 text-gray-500">
+                      <MessageCircle className="w-4 h-4" />
+                      <span className="text-sm">{post.comments}</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1 text-gray-500">
-                    <Heart className="w-4 h-4" />
-                    <span className="text-sm">{post.likes}</span>
-                  </div>
-                  <div className="flex items-center gap-1 text-gray-500">
-                    <MessageCircle className="w-4 h-4" />
-                    <span className="text-sm">{post.comments}</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
 
@@ -278,22 +252,16 @@ export default function BlogPage() {
         {filteredPosts.length === 0 && (
           <div className="text-center py-12">
             <MessageCircle className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              검색 결과가 없습니다
-            </h3>
-            <p className="text-gray-500">
-              다른 검색어나 카테고리를 시도해보세요.
-            </p>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">검색 결과가 없습니다</h3>
+            <p className="text-gray-500">다른 검색어나 카테고리를 시도해보세요.</p>
           </div>
         )}
 
         {/* Add New Post Button */}
         <div className="mt-12 text-center">
-          <Button className="bg-cert-red hover:bg-cert-red/80 text-white px-8 py-3">
-            <Plus className="w-4 h-4 mr-2" />새 글 작성
-          </Button>
+          <NewPostModal type="blog" />
         </div>
       </div>
     </div>
-  );
+  )
 }

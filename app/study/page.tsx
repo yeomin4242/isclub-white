@@ -1,459 +1,392 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  FileText,
-  Download,
-  Calendar,
-  Tag,
-  Search,
-  Plus,
-  Filter,
-  Shield,
-  Lock,
-  Eye,
-  Terminal,
-  Zap,
-} from "lucide-react";
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
+import { Progress } from "@/components/ui/progress"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Calendar, Clock, Download, FileText, Search } from "lucide-react"
+import NewPostModal from "@/components/new-post-modal"
+import Link from "next/link"
 
+// Mock data for studies
 const mockStudies = [
   {
     id: 1,
-    title: "OWASP Top 10 2023 취약점 분석",
-    date: "2024-01-15",
-    author: "김보안",
-    description:
-      "최신 OWASP Top 10 취약점에 대한 상세 분석과 실제 공격 시나리오, 대응 방안을 정리한 자료입니다.",
-    tags: ["OWASP", "Web Security", "Vulnerability"],
+    title: "네트워크 보안 모니터링",
+    description: "Wireshark와 Snort를 활용한 네트워크 트래픽 분석 및 침입 시스템 구축 방법을 다룹니다.",
+    status: "중료", // 진행중, 모집중, 중료
+    period: "2025-2 진행",
+    tags: ["Network Security", "Wireshark", "IDS"],
     attachments: [
-      { name: "OWASP_Top10_2023_Analysis.pdf", type: "pdf", size: "3.2MB" },
-      { name: "Exploit_Examples.zip", type: "zip", size: "1.8MB" },
+      { name: "Network_Monitoring.pdf", size: "3.8MB" },
+      { name: "Snort_Rules.conf", size: "45KB" },
     ],
-    category: "Web Security",
-    difficulty: "intermediate",
+    participants: { current: 8, max: 8 },
+    progress: 100,
+    leader: "재학생",
+    category: "정네트워크",
+    duration: "4주",
+    startDate: "2025-01-15",
+    endDate: "2025-02-12",
+    daysLeft: 0,
   },
   {
     id: 2,
-    title: "Metasploit Framework 완전 정복",
-    date: "2024-01-12",
-    author: "이해커",
-    description:
-      "Metasploit을 활용한 모의해킹 기법과 실습 가이드. 초보자부터 고급자까지 단계별로 학습할 수 있습니다.",
-    tags: ["Metasploit", "Penetration Testing", "Exploitation"],
+    title: "웹 해킹 기초 스터디",
+    description: "OWASP Top 10을 중심으로 한 웹 애플리케이션 보안 취약점 분석 및 실습을 진행합니다.",
+    status: "진행중",
+    period: "2025-1 진행",
+    tags: ["Web Security", "OWASP", "Penetration Testing"],
     attachments: [
-      { name: "Metasploit_Guide.pdf", type: "pdf", size: "5.1MB" },
-      { name: "Lab_Environment.ova", type: "ova", size: "2.3GB" },
+      { name: "OWASP_Top10_Guide.pdf", size: "2.1MB" },
+      { name: "Lab_Environment.zip", size: "156MB" },
     ],
-    category: "Penetration Testing",
-    difficulty: "advanced",
+    participants: { current: 6, max: 10 },
+    progress: 65,
+    leader: "김보안",
+    category: "웹보안",
+    duration: "6주",
+    startDate: "2025-01-08",
+    endDate: "2025-02-19",
+    daysLeft: 12,
   },
   {
     id: 3,
-    title: "암호학 기초와 RSA 구현",
-    date: "2024-01-10",
-    author: "박암호",
-    description:
-      "현대 암호학의 기초 이론부터 RSA 알고리즘의 수학적 원리와 Python 구현까지 다룹니다.",
-    tags: ["Cryptography", "RSA", "Python"],
-    attachments: [
-      { name: "Cryptography_Basics.pdf", type: "pdf", size: "2.7MB" },
-      { name: "RSA_Implementation.py", type: "py", size: "15KB" },
-    ],
-    category: "Cryptography",
-    difficulty: "beginner",
+    title: "암호학 기초 이론",
+    description: "대칭키, 비대칭키 암호화부터 해시 함수, 디지털 서명까지 암호학의 기본 개념을 학습합니다.",
+    status: "모집중",
+    period: "2025-2 예정",
+    tags: ["Cryptography", "Theory", "Mathematics"],
+    attachments: [],
+    participants: { current: 3, max: 8 },
+    progress: 0,
+    leader: "이암호",
+    category: "암호학",
+    duration: "8주",
+    startDate: "2025-02-01",
+    endDate: "2025-03-26",
+    daysLeft: 18,
   },
   {
     id: 4,
-    title: "디지털 포렌식 실무 가이드",
-    date: "2024-01-08",
-    author: "최포렌식",
-    description:
-      "Autopsy와 Volatility를 활용한 디지털 증거 수집과 분석 방법론을 실습 중심으로 설명합니다.",
-    tags: ["Digital Forensics", "Autopsy", "Volatility"],
+    title: "디지털 포렌식 실습",
+    description: "실제 사건 사례를 바탕으로 한 디지털 증거 수집 및 분석 기법을 실습합니다.",
+    status: "진행중",
+    period: "2025-1 진행",
+    tags: ["Digital Forensics", "Investigation", "Tools"],
     attachments: [
-      { name: "Forensics_Guide.pdf", type: "pdf", size: "4.5MB" },
-      { name: "Sample_Evidence.dd", type: "dd", size: "512MB" },
+      { name: "Forensics_Tools_Guide.pdf", size: "4.2MB" },
+      { name: "Case_Study_1.docx", size: "890KB" },
+      { name: "Evidence_Sample.img", size: "2.1GB" },
     ],
-    category: "Digital Forensics",
-    difficulty: "intermediate",
+    participants: { current: 5, max: 6 },
+    progress: 40,
+    leader: "박포렌식",
+    category: "포렌식",
+    duration: "10주",
+    startDate: "2025-01-01",
+    endDate: "2025-03-12",
+    daysLeft: 25,
   },
-  {
-    id: 5,
-    title: "네트워크 보안 모니터링",
-    date: "2024-01-05",
-    author: "정네트워크",
-    description:
-      "Wireshark와 Snort를 활용한 네트워크 트래픽 분석과 침입 탐지 시스템 구축 방법을 다룹니다.",
-    tags: ["Network Security", "Wireshark", "IDS"],
-    attachments: [
-      { name: "Network_Monitoring.pdf", type: "pdf", size: "3.8MB" },
-      { name: "Snort_Rules.conf", type: "conf", size: "45KB" },
-    ],
-    category: "Network Security",
-    difficulty: "intermediate",
-  },
-];
-
-const categories = [
-  "전체",
-  "Web Security",
-  "Penetration Testing",
-  "Cryptography",
-  "Digital Forensics",
-  "Network Security",
-  "Malware Analysis",
-];
-const difficulties = ["전체", "beginner", "intermediate", "advanced"];
-const allTags = [
-  "OWASP",
-  "Web Security",
-  "Vulnerability",
-  "Metasploit",
-  "Penetration Testing",
-  "Exploitation",
-  "Cryptography",
-  "RSA",
-  "Python",
-  "Digital Forensics",
-  "Autopsy",
-  "Volatility",
-  "Network Security",
-  "Wireshark",
-  "IDS",
-  "Malware Analysis",
-];
+]
 
 export default function StudyPage() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("전체");
-  const [selectedDifficulty, setSelectedDifficulty] = useState("전체");
-  const [selectedTag, setSelectedTag] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("")
+  const [statusFilter, setStatusFilter] = useState("all")
+  const [categoryFilter, setCategoryFilter] = useState("all")
 
   const filteredStudies = mockStudies.filter((study) => {
     const matchesSearch =
       study.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       study.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      study.author.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory =
-      selectedCategory === "전체" || study.category === selectedCategory;
-    const matchesDifficulty =
-      selectedDifficulty === "전체" || study.difficulty === selectedDifficulty;
-    const matchesTag =
-      selectedTag === "all" ||
-      selectedTag === "" ||
-      study.tags.includes(selectedTag);
-    return matchesSearch && matchesCategory && matchesDifficulty && matchesTag;
-  });
+      study.tags.some((tag) => tag.toLowerCase().includes(searchTerm.toLowerCase()))
 
-  const getFileIcon = (type: string) => {
-    switch (type) {
-      case "pdf":
-        return <FileText className="w-4 h-4 text-cert-red" />;
-      case "zip":
-        return <FileText className="w-4 h-4 text-cert-accent" />;
-      case "py":
-        return <Terminal className="w-4 h-4 text-green-400" />;
+    const matchesStatus = statusFilter === "all" || study.status === statusFilter
+    const matchesCategory = categoryFilter === "all" || study.category === categoryFilter
+
+    return matchesSearch && matchesStatus && matchesCategory
+  })
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "진행중":
+        return "bg-blue-100 text-blue-800 border-blue-200"
+      case "모집중":
+        return "bg-green-100 text-green-800 border-green-200"
+      case "중료":
+        return "bg-gray-100 text-gray-800 border-gray-200"
       default:
-        return <FileText className="w-4 h-4 text-cert-gray" />;
+        return "bg-gray-100 text-gray-800 border-gray-200"
     }
-  };
-
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case "beginner":
-        return "bg-green-50 text-green-600 border-green-200";
-      case "intermediate":
-        return "bg-yellow-50 text-yellow-600 border-yellow-200";
-      case "advanced":
-        return "bg-red-50 text-red-600 border-red-200";
-      default:
-        return "bg-gray-50 text-gray-600 border-gray-200";
-    }
-  };
-
-  const getDifficultyIcon = (difficulty: string) => {
-    switch (difficulty) {
-      case "beginner":
-        return <Shield className="w-3 h-3" />;
-      case "intermediate":
-        return <Lock className="w-3 h-3" />;
-      case "advanced":
-        return <Zap className="w-3 h-3" />;
-      default:
-        return <Eye className="w-3 h-3" />;
-    }
-  };
-
-  const getTagColor = (tag: string) => {
-    const colors = [
-      "bg-blue-50 text-blue-600",
-      "bg-green-50 text-green-600",
-      "bg-purple-50 text-purple-600",
-      "bg-orange-50 text-orange-600",
-      "bg-pink-50 text-pink-600",
-    ];
-    return colors[tag.length % colors.length];
-  };
+  }
 
   return (
-    <div className="min-h-screen bg-white py-12">
+    <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-12">
-          <div className="flex items-center gap-3 mb-4">
-            <Terminal className="w-8 h-8 text-cert-red" />
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Study Hub</h1>
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">스터디</h1>
+            <p className="text-gray-600 mt-2">보안 관련 학습 자료와 스터디 그룹을 확인하세요</p>
           </div>
-          <p className="text-gray-600">
-            보안 연구 자료와 학습 리소스를 공유하는 공간입니다.
-          </p>
+          <NewPostModal type="study" />
         </div>
 
-        {/* Search and Filter */}
-        <div className="mb-8 flex flex-col lg:flex-row gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-            <Input
-              placeholder="제목, 내용, 작성자로 검색..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-cert-red"
-            />
-          </div>
-          <div className="flex gap-3 flex-wrap">
-            <Select
-              value={selectedCategory}
-              onValueChange={setSelectedCategory}
-            >
-              <SelectTrigger className="w-48 bg-white border-gray-300 text-gray-900">
-                <SelectValue placeholder="카테고리" />
-              </SelectTrigger>
-              <SelectContent className="bg-white border-gray-200">
-                {categories.map((category) => (
-                  <SelectItem
-                    key={category}
-                    value={category}
-                    className="text-gray-900"
-                  >
-                    {category}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select
-              value={selectedDifficulty}
-              onValueChange={setSelectedDifficulty}
-            >
-              <SelectTrigger className="w-32 bg-white border-gray-300 text-gray-900">
-                <SelectValue placeholder="난이도" />
-              </SelectTrigger>
-              <SelectContent className="bg-white border-gray-200">
-                {difficulties.map((difficulty) => (
-                  <SelectItem
-                    key={difficulty}
-                    value={difficulty}
-                    className="text-gray-900"
-                  >
-                    {difficulty === "전체"
-                      ? difficulty
-                      : difficulty === "beginner"
-                      ? "초급"
-                      : difficulty === "intermediate"
-                      ? "중급"
-                      : "고급"}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Button className="bg-cert-red hover:bg-cert-red/80 text-white">
-              <Plus className="w-4 h-4 mr-2" />
-              자료 업로드
-            </Button>
-          </div>
-        </div>
+        {/* Filters */}
+        <Card className="bg-white shadow-sm mb-8">
+          <CardContent className="p-6">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <Input
+                    placeholder="스터디 제목, 설명, 태그로 검색..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 bg-white border-gray-300 text-black"
+                  />
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-32 bg-white border-gray-300 text-black">
+                    <SelectValue placeholder="상태" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white">
+                    <SelectItem value="all" className="text-black">
+                      전체
+                    </SelectItem>
+                    <SelectItem value="모집중" className="text-black">
+                      모집중
+                    </SelectItem>
+                    <SelectItem value="진행중" className="text-black">
+                      진행중
+                    </SelectItem>
+                    <SelectItem value="중료" className="text-black">
+                      완료
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                  <SelectTrigger className="w-32 bg-white border-gray-300 text-black">
+                    <SelectValue placeholder="분야" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white">
+                    <SelectItem value="all" className="text-black">
+                      전체
+                    </SelectItem>
+                    <SelectItem value="웹보안" className="text-black">
+                      웹보안
+                    </SelectItem>
+                    <SelectItem value="정네트워크" className="text-black">
+                      네트워크
+                    </SelectItem>
+                    <SelectItem value="암호학" className="text-black">
+                      암호학
+                    </SelectItem>
+                    <SelectItem value="포렌식" className="text-black">
+                      포렌식
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Studies Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {filteredStudies.map((study) => (
-            <Card
-              key={study.id}
-              className="bg-white border-gray-200 hover:border-cert-red/50 transition-all duration-300 hover:shadow-lg group"
-            >
-              <CardHeader className="pb-4">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <Badge
-                      variant="outline"
-                      className={getDifficultyColor(study.difficulty)}
-                    >
-                      {getDifficultyIcon(study.difficulty)}
-                      <span className="ml-1">
-                        {study.difficulty === "beginner"
-                          ? "초급"
-                          : study.difficulty === "intermediate"
-                          ? "중급"
-                          : "고급"}
-                      </span>
-                    </Badge>
-                    <Badge
-                      variant="secondary"
-                      className="bg-gray-100 text-gray-600"
-                    >
-                      {study.category}
-                    </Badge>
-                  </div>
-                  <span className="text-sm text-gray-500">{study.date}</span>
-                </div>
-                <CardTitle className="text-xl text-gray-900 group-hover:text-cert-red transition-colors">
-                  {study.title}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <CardDescription className="text-gray-600 mb-4 leading-relaxed">
-                  {study.description}
-                </CardDescription>
-
-                {/* Tags */}
-                <div className="flex flex-wrap gap-1 mb-4">
-                  {study.tags.map((tag) => (
-                    <Badge
-                      key={tag}
-                      variant="secondary"
-                      className={`text-xs ${getTagColor(tag)}`}
-                    >
-                      <Tag className="w-3 h-3 mr-1" />
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-
-                {/* Attachments */}
-                <div className="space-y-2 mb-4">
-                  <h4 className="text-sm font-medium text-gray-700 flex items-center gap-1">
-                    <FileText className="w-4 h-4" />
-                    첨부 파일
-                  </h4>
-                  {study.attachments.map((attachment, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors"
-                    >
-                      <div className="flex items-center gap-3">
-                        {getFileIcon(attachment.type)}
-                        <div>
-                          <p className="text-sm font-medium text-gray-900">
-                            {attachment.name}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            {attachment.size}
-                          </p>
-                        </div>
+            <Link key={study.id} href={`/study/${study.id}`}>
+              <Card className="bg-white shadow-sm hover:shadow-md transition-shadow duration-300 cursor-pointer">
+                <CardHeader className="pb-4">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className={getStatusColor(study.status)}>
+                        {study.status}
+                      </Badge>
+                      <div className="flex items-center gap-1 text-sm text-gray-500">
+                        <Calendar className="w-4 h-4" />
+                        <span>{study.period}</span>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-gray-500 hover:text-cert-red"
-                      >
-                        <Download className="w-4 h-4" />
-                      </Button>
                     </div>
-                  ))}
-                </div>
+                    {study.daysLeft > 0 && (
+                      <div className="text-sm text-gray-500">
+                        <Clock className="w-4 h-4 inline mr-1" />
+                        {study.daysLeft}일 남음
+                      </div>
+                    )}
+                  </div>
 
-                {/* Author and Date */}
-                <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                      <span className="text-xs font-medium text-gray-700">
-                        {study.author.slice(0, 2)}
+                  <CardTitle className="text-xl font-bold text-black mb-3 hover:text-cert-red transition-colors">
+                    {study.title}
+                  </CardTitle>
+
+                  <p className="text-black text-sm leading-relaxed mb-4">{study.description}</p>
+
+                  {/* Tags */}
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {study.tags.map((tag, index) => (
+                      <Badge
+                        key={index}
+                        variant="secondary"
+                        className={`text-xs ${
+                          index === 0
+                            ? "bg-green-100 text-green-800"
+                            : index === 1
+                              ? "bg-purple-100 text-purple-800"
+                              : "bg-orange-100 text-orange-800"
+                        }`}
+                      >
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                </CardHeader>
+
+                <CardContent className="pt-0">
+                  {/* Attachments */}
+                  {study.attachments.length > 0 && (
+                    <div className="mb-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <FileText className="w-4 h-4 text-gray-500" />
+                        <span className="text-sm font-medium text-black">첨부 파일</span>
+                      </div>
+                      <div className="space-y-2">
+                        {study.attachments.slice(0, 2).map((file, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center justify-between text-sm bg-white p-2 rounded border border-gray-200"
+                          >
+                            <div className="flex items-center gap-2">
+                              <FileText className="w-4 h-4 text-red-500" />
+                              <span className="text-black">{file.name}</span>
+                              <span className="text-gray-500">{file.size}</span>
+                            </div>
+                            <Button variant="ghost" size="sm" className="text-gray-400 hover:text-cert-red">
+                              <Download className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        ))}
+                        {study.attachments.length > 2 && (
+                          <div className="text-xs text-gray-500">+{study.attachments.length - 2}개 더</div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Participants and Progress */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-black">참가자</span>
+                      <span className="font-medium text-black">
+                        {study.participants.current}/{study.participants.max}
                       </span>
                     </div>
-                    <span className="font-medium">{study.author}</span>
+
+                    <div className="space-y-2">
+                      <Progress value={(study.participants.current / study.participants.max) * 100} className="h-2" />
+                      <div className="text-xs text-gray-500">
+                        {Math.round((study.participants.current / study.participants.max) * 100)}%
+                      </div>
+                    </div>
+
+                    {/* Leader and Category */}
+                    <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                      <div className="flex items-center gap-4">
+                        <Badge variant="outline" className="text-xs bg-blue-50 text-blue-600 border-blue-200">
+                          {study.leader}
+                        </Badge>
+                        <span className="text-sm text-black">{study.category}</span>
+                      </div>
+
+                      {study.status === "모집중" && (
+                        <Button size="sm" className="bg-cert-red hover:bg-cert-red/80 text-white">
+                          참가 요청
+                        </Button>
+                      )}
+
+                      {study.status === "진행중" && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="border-cert-red text-cert-red hover:bg-cert-red hover:text-white bg-transparent"
+                        >
+                          참가 요청
+                        </Button>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1 text-sm text-gray-500">
-                    <Calendar className="w-4 h-4" />
-                    <span>{study.date}</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
 
         {/* Empty State */}
         {filteredStudies.length === 0 && (
-          <div className="text-center py-12">
-            <Terminal className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              검색 결과가 없습니다
-            </h3>
-            <p className="text-gray-500">다른 검색어나 필터를 시도해보세요.</p>
-          </div>
+          <Card className="bg-white shadow-sm">
+            <CardContent className="text-center py-12">
+              <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-black mb-2">검색 결과가 없습니다</h3>
+              <p className="text-black mb-6">다른 검색어나 필터를 시도해보세요.</p>
+              <Button
+                onClick={() => {
+                  setSearchTerm("")
+                  setStatusFilter("all")
+                  setCategoryFilter("all")
+                }}
+                variant="outline"
+                className="border-cert-red text-cert-red hover:bg-cert-red hover:text-white"
+              >
+                필터 초기화
+              </Button>
+            </CardContent>
+          </Card>
         )}
 
-        {/* Study Stats */}
-        <div className="mt-16 grid grid-cols-1 md:grid-cols-4 gap-6">
-          {[
-            {
-              title: "총 자료",
-              value: mockStudies.length,
-              icon: FileText,
-            },
-            {
-              title: "카테고리",
-              value: categories.length - 1,
-              icon: Tag,
-            },
-            {
-              title: "첨부파일",
-              value: mockStudies.reduce(
-                (acc, study) => acc + study.attachments.length,
-                0
-              ),
-              icon: Download,
-            },
-            {
-              title: "연구진",
-              value: new Set(mockStudies.map((s) => s.author)).size,
-              icon: Terminal,
-            },
-          ].map((stat, index) => (
-            <Card
-              key={index}
-              className="text-center bg-white border-gray-200 hover:border-cert-red/50 transition-all duration-300 hover:shadow-lg group"
-            >
-              <CardHeader>
-                <div className="flex justify-center mb-2">
-                  <stat.icon className="w-8 h-8 text-cert-red group-hover:scale-110 transition-transform duration-300" />
-                </div>
-                <CardTitle className="text-2xl font-bold text-gray-900 group-hover:text-cert-red transition-colors">
-                  {stat.value}
-                </CardTitle>
-                <CardDescription className="text-gray-600">
-                  {stat.title}
-                </CardDescription>
-              </CardHeader>
-            </Card>
-          ))}
+        {/* Study Statistics */}
+        <div className="mt-12 grid grid-cols-1 md:grid-cols-4 gap-6">
+          <Card className="bg-white shadow-sm">
+            <CardContent className="p-6 text-center">
+              <div className="text-2xl font-bold text-cert-red mb-2">
+                {mockStudies.filter((s) => s.status === "진행중").length}
+              </div>
+              <div className="text-sm text-black">진행중인 스터디</div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white shadow-sm">
+            <CardContent className="p-6 text-center">
+              <div className="text-2xl font-bold text-green-600 mb-2">
+                {mockStudies.filter((s) => s.status === "모집중").length}
+              </div>
+              <div className="text-sm text-black">모집중인 스터디</div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white shadow-sm">
+            <CardContent className="p-6 text-center">
+              <div className="text-2xl font-bold text-gray-600 mb-2">
+                {mockStudies.filter((s) => s.status === "중료").length}
+              </div>
+              <div className="text-sm text-black">완료된 스터디</div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white shadow-sm">
+            <CardContent className="p-6 text-center">
+              <div className="text-2xl font-bold text-blue-600 mb-2">
+                {mockStudies.reduce((acc, study) => acc + study.participants.current, 0)}
+              </div>
+              <div className="text-sm text-black">총 참가자 수</div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
-  );
+  )
 }
